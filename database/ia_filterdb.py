@@ -253,55 +253,67 @@ def unpack_new_file_id(new_file_id):
 
 async def send_msg(bot, filename, caption): 
     try:
+        # Clean up filename and caption
         filename = re.sub(r'\(\@\S+\)|\[\@\S+\]|\b@\S+|\bwww\.\S+', '', filename).strip()
         caption = re.sub(r'\(\@\S+\)|\[\@\S+\]|\b@\S+|\bwww\.\S+', '', caption).strip()
         
+        # Extract Year
         year_match = re.search(r"\b(19|20)\d{2}\b", caption)
-        year = year_match.group(0) if year_match else None
+        year = year_match.group(0) if year_match else "Unknown Year"
 
-        pattern = r"(?i)(?:s|season)0*(\d{1,2})"
-        season = re.search(pattern, caption) or re.search(pattern, filename)
-        season = season.group(1) if season else None 
-
-        if year:
-            filename = filename[: filename.find(year) + 4]  
-        elif season and season in filename:
-            filename = filename[: filename.find(season) + 1]
-
+        # Extract Quality
         qualities = ["ORG", "org", "hdcam", "HDCAM", "HQ", "hq", "HDRip", "hdrip", "camrip", "CAMRip", "hdtc", "predvd", "DVDscr", "dvdscr", "dvdrip", "dvdscr", "HDTC", "dvdscreen", "HDTS", "hdts"]
         quality = await get_qualities(caption.lower(), qualities) or "HDRip"
 
+        # Extract Language
         language = ""
         possible_languages = CAPTION_LANGUAGES
         for lang in possible_languages:
             if lang.lower() in caption.lower():
                 language += f"{lang}, "
-        language = language[:-2] if language else "Not idea 😄"
+        language = language[:-2] if language else "Unknown Language"
+        
+        # Extract Genre (if available in the caption)
+        genres = ["Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy", "History", "Horror", "Musical", "Mystery", "Romance", "Sci-Fi", "Sport", "Thriller", "War", "Western"]
+        genre_list = [g for g in genres if g.lower() in caption.lower()]
+        genre = " | ".join(genre_list) if genre_list else "Unknown Genre"
 
-        filename = re.sub(r"[\(\)\[\]\{\}:;'\-!]", "", filename)
+        # Format the message text
+        text = f"""Movie :- {filename} ({year})
+Language :- #{language.replace(" ", "")}
+Genre :- {genre}
+Quality :- {quality}
 
-        text = "#𝑵𝒆𝒘_𝑭𝒊𝒍𝒆_𝑨𝒅𝒅𝒆𝒅 ✅\n\n👷𝑵𝒂𝒎𝒆: `{}`\n\n🌳𝑸𝒖𝒂𝒍𝒊𝒕𝒚: {}\n\n🍁𝑨𝒖𝒅𝒊𝒐: {}"
-        text = text.format(filename, quality, language)
+JOIN OUR CHANNEL @Troop0riginals FOR LATEST UPDATES
 
-        if await add_name(OWNERID, filename):
-            imdb = await get_movie_details(filename)  
-            resized_poster = None
+Streaming And Download Links 👇
+https://example.com/{filename.replace(" ", '-').lower()}-{year}
 
-            if imdb:
-                poster_url = imdb.get('poster_url')
-                if poster_url:
-                    resized_poster = await fetch_image(poster_url)  
+How To Download Links & Files :
+https://t.me/TroopsOSL"""
 
-            filenames = filename.replace(" ", '-')
-            btn = [[InlineKeyboardButton('🌲 Get Files 🌲', url=f"https://telegram.me/{temp.U_NAME}?start=getfile-{filenames}")]]
-            
-            if resized_poster:
-                await bot.send_photo(chat_id=MOVIE_UPDATE_CHANNEL, photo=resized_poster, caption=text, reply_markup=InlineKeyboardMarkup(btn))
-            else:              
-                await bot.send_message(chat_id=MOVIE_UPDATE_CHANNEL, text=text, reply_markup=InlineKeyboardMarkup(btn))
+        # Prepare Inline Button
+        filenames = filename.replace(" ", '-')
+        btn = [[InlineKeyboardButton('🌲 Get Files 🌲', url=f"https://telegram.me/{temp.U_NAME}?start=getfile-{filenames}")]]
+        
+        # Fetch Poster if Available
+        imdb = await get_movie_details(filename)  
+        resized_poster = None
 
-    except:
-        pass
+        if imdb:
+            poster_url = imdb.get('poster_url')
+            if poster_url:
+                resized_poster = await fetch_image(poster_url)  
+
+        # Send Message
+        if resized_poster:
+            await bot.send_photo(chat_id=MOVIE_UPDATE_CHANNEL, photo=resized_poster, caption=text, reply_markup=InlineKeyboardMarkup(btn))
+        else:              
+            await bot.send_message(chat_id=MOVIE_UPDATE_CHANNEL, text=text, reply_markup=InlineKeyboardMarkup(btn))
+
+    except Exception as e:
+        logger.exception("Error in send_msg function: %s", e)
+
 
 async def get_qualities(text, qualities: list):
     """Get all Quality from text"""
