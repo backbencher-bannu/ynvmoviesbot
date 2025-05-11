@@ -270,7 +270,7 @@ async def send_msg(bot, filename, caption):
         possible_languages = CAPTION_LANGUAGES
         for lang in possible_languages:
             if lang.lower() in caption.lower():
-                language += f"{lang}, "
+                language += f"#{lang}, "
         language = language[:-2] if language else "Unknown Language"
         
         # Extract Genre (if available in the caption)
@@ -279,18 +279,13 @@ async def send_msg(bot, filename, caption):
         genre = " | ".join(genre_list) if genre_list else "Unknown Genre"
 
         # Format the message text
-        text = f"""Movie :- {filename} ({year})
-Language :- #{language.replace(" ", "")}
-Genre :- {genre}
-Quality :- {quality}
+        text = f"""🎬 Movie :- {filename} ({year})
+🌍 Language :- {language}
+🎭 Genre :- {genre}
+🔝 Quality :- {quality}
 
-JOIN OUR CHANNEL @Troop0riginals FOR LATEST UPDATES
-
-Streaming And Download Links 👇
-https://example.com/{filename.replace(" ", '-').lower()}-{year}
-
-How To Download Links & Files :
-https://t.me/TroopsOSL"""
+👉 JOIN OUR CHANNEL @ynvmoviesupdates FOR LATEST UPDATES
+"""
 
         # Prepare Inline Button
         filenames = filename.replace(" ", '-')
@@ -305,15 +300,15 @@ https://t.me/TroopsOSL"""
             if poster_url:
                 resized_poster = await fetch_image(poster_url)  
 
-        # Send Message
-        if resized_poster:
-            await bot.send_photo(chat_id=MOVIE_UPDATE_CHANNEL, photo=resized_poster, caption=text, reply_markup=InlineKeyboardMarkup(btn))
-        else:              
-            await bot.send_message(chat_id=MOVIE_UPDATE_CHANNEL, text=text, reply_markup=InlineKeyboardMarkup(btn))
+            if resized_poster:
+                # Send poster with message
+                await bot.send_photo(chat_id=MOVIE_UPDATE_CHANNEL, photo=resized_poster, caption=text, reply_markup=InlineKeyboardMarkup(btn))
+            else:
+                # Send text-only message if no poster
+                await bot.send_message(chat_id=MOVIE_UPDATE_CHANNEL, text=text, reply_markup=InlineKeyboardMarkup(btn))
 
     except Exception as e:
-        logger.exception("Error in send_msg function: %s", e)
-
+        logger.error(f"Error sending message: {e}")
 
 async def get_qualities(text, qualities: list):
     """Get all Quality from text"""
