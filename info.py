@@ -92,7 +92,7 @@ HOW_TO_VERIFY = environ.get('HOW_TO_VERIFY', 'https://t.me/How_to_Download_7x/30
 # ============================
 IS_SHORTLINK = bool(environ.get('IS_SHORTLINK', False))
 SHORTLINK_URL = environ.get('SHORTLINK_URL', 'avhlink.site')
-SHORTLINK_API = environ.get('SHORTLINK_API', '088f69f5d57ecf4cdb546b9093f5c9c133fbf2d0)
+SHORTLINK_API = environ.get('SHORTLINK_API', '088f69f5d57ecf4cdb546b9093f5c9c133fbf2d0')
 TUTORIAL = environ.get('TUTORIAL', 'https://t.me/')  # Tutorial video link for opening shortlink website
 IS_TUTORIAL = bool(environ.get('IS_TUTORIAL', False))
 
