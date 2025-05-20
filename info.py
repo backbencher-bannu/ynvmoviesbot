@@ -70,7 +70,7 @@ APPROVED = environ.get("APPROVED_WELCOME", "on").lower()
 DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://harishkumargorinta:P6ak9kZKvx33Jx3@ynvmovies.p8afuzn.mongodb.net/?retryWrites=true&w=majority&appName=ynvmovies")
 DATABASE_URI2 = environ.get('DATABASE_URI2', "mongodb+srv://harishkumargorinta:P6ak9kZKvx33Jx3@ynvmovies.p8afuzn.mongodb.net/?retryWrites=true&w=majority&appName=ynvmovies")
 DATABASE_NAME = environ.get('DATABASE_NAME', "yato")
-COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Telegram_files')
+COLLECTION_NAME = environ.get('COLLECTION_NAME', 'ynv_files')
 
 # ============================
 # Movie Notification & Update Settings
